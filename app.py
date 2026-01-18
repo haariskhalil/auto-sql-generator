@@ -66,19 +66,25 @@ st.title("⚡ Data Commander")
 st.markdown("### Talk to your database in plain English")
 
 with st.expander("📂 View Database Schema & Data (Click to Expand)", expanded=False):
-    col1, col2 = st.columns(2)
+    # This will look cramped on smaller screens - perfect for our "Before" commit
+    col1, col2, col3 = st.columns(3)
     
     conn = get_db_connection()
     
     with col1:
-        st.subheader("Employees Table")
+        st.subheader("Employees")
         df_emp = pd.read_sql("SELECT * FROM employees", conn)
-        st.dataframe(df_emp, use_container_width=True, height=200) # Built-in scroll
+        st.dataframe(df_emp, use_container_width=True, height=200)
     
     with col2:
-        st.subheader("Departments Table")
+        st.subheader("Departments")
         df_dept = pd.read_sql("SELECT * FROM departments", conn)
         st.dataframe(df_dept, use_container_width=True, height=200)
+
+    with col3:
+        st.subheader("Projects") # <--- The new table!
+        df_proj = pd.read_sql("SELECT * FROM projects", conn)
+        st.dataframe(df_proj, use_container_width=True, height=200)
     
     conn.close()
 
@@ -124,11 +130,15 @@ if prompt := st.chat_input("Ask a question...") or query_to_run:
     with st.chat_message("assistant"):
         with st.spinner("Thinking in SQL..."):
             
-            # Refined Prompt for better SQL generation
+            # Prompt for better SQL generation
             db_schema = """
-            Table: employees (id, name, salary, department_id, hire_date)
-            Table: departments (id, name)
-            Relationship: employees.department_id = departments.id
+            Table: employees (id, name, email, salary, department_id, hire_date)
+            Table: departments (id, name, manager_name)
+            Table: projects (id, name, budget, deadline, department_id, status)
+
+            Relationships:
+            - employees.department_id -> departments.id
+            - projects.department_id -> departments.id
             """
             
             system_prompt = f"""
