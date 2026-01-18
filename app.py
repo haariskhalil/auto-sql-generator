@@ -32,10 +32,6 @@ with st.sidebar:
     st.header("⚙️ Configuration")
     api_key = st.text_input("Gemini API Key", type="password")
     
-    st.divider()
-    
-    st.markdown("### 💡 Tips")
-    st.info("Try asking about 'Salaries' or 'Department counts'.")
 
 # 4. INITIALIZE GEMINI
 if not api_key:
@@ -66,25 +62,25 @@ st.title("⚡ Data Commander")
 st.markdown("### Talk to your database in plain English")
 
 with st.expander("📂 View Database Schema & Data (Click to Expand)", expanded=False):
-    # This will look cramped on smaller screens - perfect for our "Before" commit
-    col1, col2, col3 = st.columns(3)
+    # Use Tabs for a cleaner UI instead of squeezing columns
+    tab1, tab2, tab3 = st.tabs(["Employees", "Departments", "Projects"])
     
     conn = get_db_connection()
     
-    with col1:
-        st.subheader("Employees")
+    with tab1:
+        st.subheader("Employees Table")
         df_emp = pd.read_sql("SELECT * FROM employees", conn)
-        st.dataframe(df_emp, use_container_width=True, height=200)
+        st.dataframe(df_emp, use_container_width=True)
     
-    with col2:
-        st.subheader("Departments")
+    with tab2:
+        st.subheader("Departments Table")
         df_dept = pd.read_sql("SELECT * FROM departments", conn)
-        st.dataframe(df_dept, use_container_width=True, height=200)
+        st.dataframe(df_dept, use_container_width=True)
 
-    with col3:
-        st.subheader("Projects") # <--- The new table!
+    with tab3:
+        st.subheader("Projects Table")
         df_proj = pd.read_sql("SELECT * FROM projects", conn)
-        st.dataframe(df_proj, use_container_width=True, height=200)
+        st.dataframe(df_proj, use_container_width=True)
     
     conn.close()
 
@@ -99,25 +95,38 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # 8. THE BRAIN
-# Add clickable pills for quick queries
-example_prompts = [
-    "Who has the highest salary?", 
-    "Show average salary by department", 
-    "List all employees in Engineering",
-    "Count employees per department"
-]
+st.markdown("### 💡 Quick Suggestions")
 
-button_cols = st.columns(4)
+# Organize suggestions into columns by topic
+sugg_col1, sugg_col2, sugg_col3 = st.columns(3)
+
 query_to_run = None
 
-# Create buttons that trigger the query
-for i, prompt in enumerate(example_prompts):
-    if button_cols[i].button(prompt, use_container_width=True):
-        query_to_run = prompt
+with sugg_col1:
+    st.caption("👥 People & Depts")
+    if st.button("💰 Who earns the most?", use_container_width=True):
+        query_to_run = "Who has the highest salary?"
+    if st.button("👨‍💼 Manager of Engineering?", use_container_width=True):
+        query_to_run = "Who is the manager of the Engineering department?"
+
+with sugg_col2:
+    st.caption("🚀 Projects")
+    if st.button("🚧 List active projects", use_container_width=True):
+        query_to_run = "Show me all projects with status 'In Progress'"
+    if st.button("💸 High budget projects", use_container_width=True):
+        query_to_run = "Which projects have a budget greater than 50000?"
+
+with sugg_col3:
+    st.caption("📊 Analytics")
+    if st.button("📈 Salary by Dept", use_container_width=True):
+        query_to_run = "Show the average salary for each department"
+    if st.button("🔢 Employee Count", use_container_width=True):
+        query_to_run = "Count how many employees are in each department"
 
 # Input field (works for both manual typing and button clicks)
-if prompt := st.chat_input("Ask a question...") or query_to_run:
-    # If it was a button click, we need to treat it as a prompt
+# Using a placeholder logic: if a button was clicked, use that prompt.
+if prompt := st.chat_input("Ask a question about the data...") or query_to_run:
+    # If it was a button click, treat it as the user prompt
     if query_to_run and not prompt: 
         prompt = query_to_run
 
