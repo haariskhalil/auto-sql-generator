@@ -4,7 +4,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.42-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
-![Gemini](https://img.shields.io/badge/AI-Gemini%202.0%20Flash-8E75B2?style=for-the-badge&logo=google&logoColor=white)
+![Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash%20Lite-8E75B2?style=for-the-badge&logo=google&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 **SQL Data Commander** is a Generative AI application that bridges the gap between non-technical users and complex databases. By leveraging **Google Gemini**, it translates natural language questions into optimized SQL queries, executes them against a live database, and automatically visualizes the results.
@@ -84,7 +84,10 @@ streamlit run app.py
 
 ## 📂 Project Structure
 
+```text
 auto-sql-generator/
+├── assets/
+│   └── demo_screenshot.png  # Application Screenshot
 ├── app.py                 # Main application logic (Streamlit + LLM)
 ├── seed_data.py           # Database generation script (Faker)
 ├── requirements.txt       # Project dependencies
